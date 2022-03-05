@@ -1,0 +1,29 @@
+version: "3.9"
+
+volumes:
+  postgres:
+  go-modules:
+
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - go-modules:/go/pkg/mod
+  db:
+    image: "postgres:12"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      PGDATA: "/data/postgres"
+    volumes:
+      - postgres:/data/postgres
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "15432:5432"
+    restart: unless-stopped
